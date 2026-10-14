@@ -1,0 +1,8 @@
+{
+  "tools": ["minimap2", "samtools"],
+  "files": [
+    { "url": "C.Elegans.fa", "path": "C.Elegans.fa" },
+    { "url": "SRR065390_1.fastq", "path": "SRR065390_1.fastq" },
+    { "url": "SRR065390_2.fastq", "path": "SRR065390_2.fastq" }
+  ]
+}

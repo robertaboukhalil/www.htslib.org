@@ -44,6 +44,7 @@ align against either a pre-built index or directly against a fasta file
 as SAM:
 
     minimap2 -t 8 -a -x sr C.Elegans.fa SRR065390_1.fastq SRR065390_2.fastq -o CE.sam
+{: .language-bash}
 
 This outputs in SAM (-a), uses 8 threads (-t 8), with options for
 paired end short read (-x sr).
@@ -74,6 +75,7 @@ tutorials which use `-S` to indicate SAM or have an explicit SAM to
 BAM conversion using `samtools view`.  This is not necessary.
 
     samtools fixmate -O bam,level=1 CE.sam fixmate.bam
+{: .language-bash}
 
 The `-O bam,level=1` requests the fastest level of BAM compression
 for the output file.  We could also use `level=0` (or use `-u`) for
@@ -93,6 +95,7 @@ The first stage is also implemented with `samtools fixmate`, so we can
 amend the previous step with an additional flag:
 
     samtools fixmate -O bam,level=1 -m CE.sam fixmate.bam
+{: .language-bash}
 
 This adds mate cigar (MC) and mate score tags (ms) which will be used
 later by `samtools markdup` proper.
@@ -103,6 +106,7 @@ The data can now be converted to genome chromosome and coordinate
 order with:
 
     samtools sort -l 1 -@8 -o pos.srt.bam -T /tmp/example_prefix fixmate.bam
+{: .language-bash}
 
 Sort is highly parallel so the `-@8` option here enables to use of 8
 additional CPU threads.  It can also be sped up by providing it with
@@ -117,6 +121,7 @@ position-sorted file, utilising the extra tags added during the
 `fixmate` step.
 
     samtools markdup -O bam,level=1 pos.srt.bam markdup.bam
+{: .language-bash}
 
 #### Conversion to final file format
 
@@ -124,10 +129,12 @@ At this point you can convert to a more highly compressed BAM or to
 CRAM with `samtools view`
 
     samtools view -@8 markdup.bam -o final.bam
+{: .language-bash}
 
 or
 
     samtools view -T C.Elegans.fa -@8 markdup.bam -o final.cram
+{: .language-bash}
 
 Note if there is no other processing to do after markdup, the final
 compression level and output format may be specified directly in that
@@ -153,6 +160,7 @@ An example pipeline would be:
     samtools fixmate -u -m - - | \
     samtools sort -u -@2 -T /tmp/example_prefix - | \
     samtools markdup -@8 --reference C.Elegans.fa - final.cram
+{: .language-bash}
 
 Adjusting the number of threads used by each step may be organism and
 system specific, but samtools will only use as many as it needs so
@@ -174,6 +182,7 @@ Finally we would recommend enabling `pipefail` in your shell if
 available.  In Bash this is:
 
     set -o pipefail
+{: .language-bash}
 
 Normally the shell will only report the exit status of the final
 command in the pipeline.  With pipefail, a failure in any part of the
@@ -194,6 +203,7 @@ one very simple way of reducing long-term storage requirements.
 
     samtools sort -n -@8 final.cram | \
     samtools fastq - -1 dat_1.fq -2 dat_2.fq > /dev/null
+{: .language-bash}
 
 ### De-novo assembly
 
@@ -217,3 +227,4 @@ compression.  An example of embedding the reference is:
         samtools view -O CRAM,embed_ref in.sam -o out.cram
 
 
+<script src="https://sandbox.bio/embed.js" data-config="data/sandboxbio.json" data-cwd="htslib-fastq"></script>
